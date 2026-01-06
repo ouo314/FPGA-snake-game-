@@ -174,4 +174,6 @@ always @(*) begin
         next_safe_food_pos = (found_index + sh) & 6'h3F;
     end
 ```
+
+關於onehot to index 參考本文的design2 https://hackmd.io/@Ji0m0/rJW3pYrkt
 <img width="652" height="152" alt="螢幕擷取畫面 2026-01-05 013906" src="https://github.com/user-attachments/assets/5ad0895b-78b4-48b8-9c6d-1c64319c33df" />
