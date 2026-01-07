@@ -79,25 +79,23 @@
 ---
 
 # v2針對setup_time超時問題嘗試優化
-下面整理「第一版（你剛貼的 occupied_mask + 64 格掃描）」到「最終版（mask + rotate/onehot）」的差異，並把你為了改善 setup time 做的設計思路與觀察結果寫成可直接放進報告的內容。
 
 ## 版本差異總表
 | 面向 | 第一版（occupied_mask + 線性掃描） | 最終版（mask + rotate/onehot） |
 |---|---|---|
-| 蛇身佔用資訊 | 每個 combinational 週期用 `for` 依 `snake_x/y` + `snake_len` 重建 `occupied_mask`。[1] | 維持一個 64-bit `mask` 做狀態，移動時 set 新頭、必要時 clear 舊尾。[2] |
-| 撞身體判斷 | 每次移動後用 `for (k=1..)` 逐段比較座標（O(n) 比較）。[1] | `hit_body = mask[head_next_idx]` 的 O(1) 判斷，並加上「走到舊尾巴但沒吃到不算撞」的特判。[2] |
-| 食物生成 | 用 `seed_pos=lfsr[5:0]` 從起點掃 0..63 找第一個空格（線性 64 次檢查）。[1] | 用 `mask_for_food` 先把「新頭/尾巴變化」納入，再 rotate、onehot、encoder 找第一個 0-bit 的位置。[2] |
-| 時序壓力來源 | `occupied_mask[{snake_y, snake_x}]` 的可變索引寫入 + 64 次掃描，工具展開後容易造成很長的組合路徑。[1] | 線性掃描移除後，時序壓力可能轉移到 64-bit rotate/adder/encoder（barrel shift + `+1` + reduction OR）這條組合鏈。[2] |
+| 蛇身佔用資訊 | 每個 combinational 週期用 `for` 依 `snake_x/y` + `snake_len` 重建 `occupied_mask`。 | 維持一個 64-bit `mask` 做狀態，移動時 set 新頭、必要時 clear 舊尾。 |
+| 撞身體判斷 | 每次移動後用 `for (k=1..)` 逐段比較座標（O(n) 比較）。 | `hit_body = mask[head_next_idx]` 的 O(1) 判斷，並加上「走到舊尾巴但沒吃到不算撞」的特判。|
+| 食物生成 | 用 `seed_pos=lfsr[5:0]` 從起點掃 0..63 找第一個空格（線性 64 次檢查）。 | 用 `mask_for_food` 先把「新頭/尾巴變化」納入，再 rotate、onehot、encoder 找第一個 0-bit 的位置。|
+| 時序壓力來源 | `occupied_mask[{snake_y, snake_x}]` 的可變索引寫入 + 64 次掃描，工具展開後容易造成很長的組合路徑。| 線性掃描移除後，時序壓力可能轉移到 64-bit rotate/adder/encoder（barrel shift + `+1` + reduction OR）這條組合鏈。 |
 
-## 你改善 setup 的核心思路
-- 把「每拍重建蛇身佔用」改成「維護狀態 mask」，讓撞身體從 O(n) 比較變成 O(1) 查表，縮短 `snake_len/snake_x/y → hit_body` 的組合路徑。[2]
-- 把「吃到/撞到」判斷從使用更新後的 `snake_x[0]` 改成使用 `head_next_x/y`，避免 nonblocking 更新造成同一拍判斷用到舊值，讓邏輯更同步可預期。[2]
-- 嘗試用演算法優化食物生成：把「64 次線性掃描」改成位元運算快速找空位（rotate + onehot + encoder），目標是減少迴圈展開的比較深度。[2]
-- 在整體架構上，你也嘗試把「慢動作（0.5s 移動/1s 倒數/掃描）」改成以 tick/enable 控制，而不是讓遊戲每個 50MHz 週期都做重計算；早期也出現過帶 `tick` 輸入的版本作為探索方向。[3][1]
+## 改善 setup 的核心思路
+- 把「每拍重建蛇身佔用」改成「維護狀態 mask」，讓撞身體從 O(n) 比較變成 O(1) 查表，縮短 `snake_len/snake_x/y → hit_body` 的組合路徑。
+- 把「吃到/撞到」判斷從使用更新後的 `snake_x[0]` 改成使用 `head_next_x/y`，避免 nonblocking 更新造成同一拍判斷用到舊值，讓邏輯更同步可預期。
+- 嘗試用演算法優化食物生成：把「64 次線性掃描」改成位元運算快速找空位（rotate + onehot + encoder），目標是減少迴圈展開的比較深度。
 
-## 結果與觀察（為什麼還可能卡）
-- 最終版確實把「撞身體」與「佔用資訊」的主要路徑縮短成 64-bit mask 的索引操作，通常比第一版的座標逐段比較更有利於時序。[2]
-- 但最終版的 `food generate (combinational)` 變成一段很集中的 64-bit 組合鏈（rotate/shift、加法 `rotated_mask + 1`、再做多層 reduction OR encoder），這在 50MHz（20ns）下仍可能是新的 critical path。[2]
+## 結果與觀察
+- 最終版確實把「撞身體」與「佔用資訊」的主要路徑縮短成 64-bit mask 的索引操作，比第一版的座標逐段比較更有利於時序。
+- 但最終版的 `food generate (combinational)` 變成一段很集中的 64-bit 組合鏈（rotate/shift、加法 `rotated_mask + 1`、再做多層 reduction OR encoder），這在 50MHz（20ns）下仍可能是新的 critical path。
 ---
 ## V1
 ```verilog
