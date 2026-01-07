@@ -1,0 +1,14 @@
+
+State Machine - |snake|snake_core:u_core|next_dir
+Name next_dir.DIR_UP next_dir.DIR_LEFT next_dir.DIR_DOWN next_dir.DIR_RIGHT 
+next_dir.DIR_RIGHT 0 0 0 0 
+next_dir.DIR_DOWN 0 0 1 1 
+next_dir.DIR_LEFT 0 1 0 1 
+next_dir.DIR_UP 1 0 0 1 
+
+State Machine - |snake|snake_core:u_core|cur_dir
+Name cur_dir.DIR_UP cur_dir.DIR_LEFT cur_dir.DIR_DOWN cur_dir.DIR_RIGHT 
+cur_dir.DIR_RIGHT 0 0 0 0 
+cur_dir.DIR_DOWN 0 0 1 1 
+cur_dir.DIR_LEFT 0 1 0 1 
+cur_dir.DIR_UP 1 0 0 1 

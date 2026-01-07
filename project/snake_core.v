@@ -74,10 +74,10 @@ module snake_core (
                     (next_dir == DIR_LEFT  && snake_x[0] == 3'd0) ||
                     (next_dir == DIR_RIGHT && snake_x[0] == 3'd7));
 
-        // 這一步是否吃到：用 next head 判斷
+        // 用 next head 判斷 這一步是否吃到 
         ate_next = (head_next_x == food_x) && (head_next_y == food_y);
 
-        // 撞身體：O(1) 用 mask 判斷
+        // 撞身體 用 mask 判斷
         // 特判：若「沒吃到」且 next head 剛好走到舊尾巴位置，這拍尾巴會被清掉，因此不算撞
         hit_body = mask[head_next_idx] && !((!ate_next) && (head_next_idx == tail_idx));
 
@@ -98,7 +98,7 @@ module snake_core (
     wire [5:0] sh = lfsr[5:0];
 
     always @(*) begin
-        // rotate：sh==0 特判避免 <<64 / >>64
+        // rotate
         if (sh == 6'd0) begin
             rotated_mask = mask_for_food;
         end else begin
@@ -140,7 +140,7 @@ module snake_core (
                 snake_y[i] <= 3'd0;
             end
 
-            // mask reset（不要用 snake_x/y 推，直接用常數座標 set）
+            // mask reset
             mask <= 64'd0;
             mask[{3'd3,3'd4}] <= 1'b1;
             mask[{3'd3,3'd3}] <= 1'b1;
@@ -212,7 +212,7 @@ module snake_core (
                             if (snake_len < 4'd15) snake_len <= snake_len + 1'b1;
                             if (score < 7'd99)     score     <= score + 1'b1;
 
-                            remaining_time <= remaining_time + 6'd5;
+                            if (remaining_time < 7'd99)  remaining_time <= remaining_time + 6'd5;
                         end
                     end
                 end else begin

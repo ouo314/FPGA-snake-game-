@@ -1,0 +1,51 @@
+
+module snake (
+    input wire MAX10_CLK1_50,
+    input wire [1:0] KEY,      // KEY[0] = Reset
+    
+    input  wire [3:0] KEYPAD_COL,
+    output wire [3:0] KEYPAD_ROW,
+    
+    output wire [7:0] LED_ROW,
+    output wire [7:0] LED_COL
+);
+
+    wire rst_n = KEY[0];
+    wire [3:0] key_val;
+    wire key_pressed;
+    
+    // 定義連接用的陣列
+    wire [2:0] snake_x [0:4];
+    wire [2:0] snake_y [0:4];
+
+    // 1. Keypad 掃描 (不用改)
+    keypad_scanner u_keypad (
+        .clk(MAX10_CLK1_50),
+        .rst_n(rst_n),
+        .col(KEYPAD_COL),
+        .row(KEYPAD_ROW),
+        .key_val(key_val),
+        .key_pressed(key_pressed)
+    );
+
+    // 2. 核心邏輯 (使用新的 snake_core)
+    snake_core u_core (
+        .clk(MAX10_CLK1_50),
+        .rst_n(rst_n),
+        .key_val(key_val),
+        .key_pressed(key_pressed),
+        .snake_x(snake_x), // 輸出陣列
+        .snake_y(snake_y)  // 輸出陣列
+    );
+
+    // 3. 顯示驅動 (使用新的 led_driver_snake)
+    led_driver_snake u_display (
+        .clk(MAX10_CLK1_50),
+        .rst_n(rst_n),
+        .body_x(snake_x), // 輸入陣列
+        .body_y(snake_y), // 輸入陣列
+        .row_pins(LED_ROW),
+        .col_pins(LED_COL)
+    );
+
+endmodule

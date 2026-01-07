@@ -1,0 +1,86 @@
+
+module snake_core (
+    input wire clk,             // 50MHz
+    input wire rst_n,
+    input wire [3:0] key_val,
+    input wire key_pressed,     
+    
+    // 輸出改成陣列，長度為 5
+    output reg [2:0] snake_x [0:4],     
+    output reg [2:0] snake_y [0:4]      
+);
+
+    // --- 參數設定 ---
+    parameter TIME_LIMIT = 25000000; // 0.5 秒
+
+    // 方向定義
+    parameter [1:0] DIR_UP    = 2'd0;
+    parameter [1:0] DIR_DOWN  = 2'd1;
+    parameter [1:0] DIR_LEFT  = 2'd2;
+    parameter [1:0] DIR_RIGHT = 2'd3;
+
+    reg [24:0] timer;   
+    reg [1:0] cur_dir;  // 當前移動方向
+    reg [1:0] next_dir; // 下一步要轉的方向
+
+    integer i;
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            // 初始位置：蛇頭在 (4,3)，身體向左延伸
+            snake_x[0] <= 3'd4; snake_y[0] <= 3'd3;
+            snake_x[1] <= 3'd3; snake_y[1] <= 3'd3;
+            snake_x[2] <= 3'd2; snake_y[2] <= 3'd3;
+            snake_x[3] <= 3'd1; snake_y[3] <= 3'd3;
+            snake_x[4] <= 3'd0; snake_y[4] <= 3'd3;
+            
+            timer   <= 0;
+            cur_dir <= DIR_RIGHT; 
+            next_dir <= DIR_RIGHT;
+        end else begin
+            
+            // 1. 方向控制 (加入禁止回頭判斷)
+            if (key_pressed) begin
+                case (key_val)
+                    // 想往上走：只要目前不是向下，就允許
+                    4'h6: if (cur_dir != DIR_DOWN) next_dir <= DIR_UP;    
+                    // 想往下走：只要目前不是向上，就允許
+                    4'h4: if (cur_dir != DIR_UP)   next_dir <= DIR_DOWN;  
+                    // 想往左走：只要目前不是向右，就允許
+                    4'h8: if (cur_dir != DIR_RIGHT) next_dir <= DIR_LEFT;  
+                    // 想往右走：只要目前不是向左，就允許
+                    4'h2: if (cur_dir != DIR_LEFT)  next_dir <= DIR_RIGHT; 
+                    default: ; 
+                endcase
+            end
+
+            // 2. 自動移動邏輯
+            if (timer >= TIME_LIMIT) begin
+                timer <= 0;
+                
+                // 更新實際方向
+                cur_dir <= next_dir;
+
+                // [身體移動]: 從尾巴開始，繼承前一格的位置
+                // snake[4] 變成 snake[3], snake[3] 變成 snake[2]...
+                for (i = 4; i > 0; i = i - 1) begin
+                    snake_x[i] <= snake_x[i-1];
+                    snake_y[i] <= snake_y[i-1];
+                end
+
+                // [蛇頭移動]: 根據新方向移動
+                case (next_dir)
+                    DIR_UP:    snake_y[0] <= snake_y[0] - 3'd1;
+                    DIR_DOWN:  snake_y[0] <= snake_y[0] + 3'd1;
+                    DIR_LEFT:  snake_x[0] <= snake_x[0] - 3'd1;
+                    DIR_RIGHT: snake_x[0] <= snake_x[0] + 3'd1;
+                endcase
+                // 3-bit 溢位自動實現穿牆
+
+            end else begin
+                timer <= timer + 1;
+            end
+        end
+    end
+
+endmodule

@@ -1,0 +1,71 @@
+
+module led_driver_snake (
+    input wire clk,
+    input wire rst_n,
+    // 接收 5 個身體部位的座標
+    input wire [2:0] body_x [0:4], 
+    input wire [2:0] body_y [0:4], 
+    
+    output reg [7:0] row_pins, 
+    output reg [7:0] col_pins  
+);
+
+    parameter SCAN_LIMIT = 50000; 
+    reg [19:0] cnt;
+    reg [2:0] scan_row;         
+
+    // 暫存計算出的 Col 訊號
+    reg [7:0] current_col_data;
+    integer k;
+
+    // Row 解碼 (Active Low)
+    function [7:0] row_decode;
+        input [2:0] r;
+        case (r)
+            3'd0: row_decode = 8'b01111111;
+            3'd1: row_decode = 8'b10111111;
+            3'd2: row_decode = 8'b11011111;
+            3'd3: row_decode = 8'b11101111;
+            3'd4: row_decode = 8'b11110111;
+            3'd5: row_decode = 8'b11111011;
+            3'd6: row_decode = 8'b11111101;
+            3'd7: row_decode = 8'b11111110;
+            default: row_decode = 8'b11111111;
+        endcase
+    endfunction
+
+    always @(posedge clk or negedge rst_n) begin
+        if (!rst_n) begin
+            cnt <= 0;
+            scan_row <= 0;
+            row_pins <= 8'hFF;
+            col_pins <= 8'h00;
+        end else begin
+            // 1. 準備這一列要顯示的資料 (Combinational calculation inside logic)
+            // 先歸零
+            current_col_data = 8'b00000000;
+            
+            // 檢查蛇的 5 節身體
+            for (k = 0; k < 5; k = k + 1) begin
+                // 如果這節身體的 Y 座標等於目前掃描的 Row
+                if (body_y[k] == scan_row) begin
+                    // 就在對應的 X 位置亮燈 (使用 OR 運算疊加)
+                    current_col_data = current_col_data | (8'b1 << body_x[k]);
+                end
+            end
+
+            // 2. 輸出到硬體
+            row_pins <= row_decode(scan_row);
+            col_pins <= current_col_data;
+
+            // 3. 掃描計數器
+            if (cnt >= SCAN_LIMIT) begin
+                cnt <= 0;
+                scan_row <= scan_row + 1;
+            end else begin
+                cnt <= cnt + 1;
+            end
+        end
+    end
+
+endmodule

@@ -1,0 +1,225 @@
+{
+	"partitions" : [
+		{
+			"name" : "Top",
+			"pins" : [
+				{
+					"name" : "KEYPAD_ROW[0]",
+					"strict" : false
+				},
+				{
+					"name" : "KEYPAD_ROW[1]",
+					"strict" : false
+				},
+				{
+					"name" : "KEYPAD_ROW[2]",
+					"strict" : false
+				},
+				{
+					"name" : "KEYPAD_ROW[3]",
+					"strict" : false
+				},
+				{
+					"name" : "LED_ROW[0]",
+					"strict" : false
+				},
+				{
+					"name" : "LED_ROW[1]",
+					"strict" : false
+				},
+				{
+					"name" : "LED_ROW[2]",
+					"strict" : false
+				},
+				{
+					"name" : "LED_ROW[3]",
+					"strict" : false
+				},
+				{
+					"name" : "LED_ROW[4]",
+					"strict" : false
+				},
+				{
+					"name" : "LED_ROW[5]",
+					"strict" : false
+				},
+				{
+					"name" : "LED_ROW[6]",
+					"strict" : false
+				},
+				{
+					"name" : "LED_ROW[7]",
+					"strict" : false
+				},
+				{
+					"name" : "LED_COL[0]",
+					"strict" : false
+				},
+				{
+					"name" : "LED_COL[1]",
+					"strict" : false
+				},
+				{
+					"name" : "LED_COL[2]",
+					"strict" : false
+				},
+				{
+					"name" : "LED_COL[3]",
+					"strict" : false
+				},
+				{
+					"name" : "LED_COL[4]",
+					"strict" : false
+				},
+				{
+					"name" : "LED_COL[5]",
+					"strict" : false
+				},
+				{
+					"name" : "LED_COL[6]",
+					"strict" : false
+				},
+				{
+					"name" : "LED_COL[7]",
+					"strict" : false
+				},
+				{
+					"name" : "HEX0[0]",
+					"strict" : false
+				},
+				{
+					"name" : "HEX0[1]",
+					"strict" : false
+				},
+				{
+					"name" : "HEX0[2]",
+					"strict" : false
+				},
+				{
+					"name" : "HEX0[3]",
+					"strict" : false
+				},
+				{
+					"name" : "HEX0[4]",
+					"strict" : false
+				},
+				{
+					"name" : "HEX0[5]",
+					"strict" : false
+				},
+				{
+					"name" : "HEX0[6]",
+					"strict" : false
+				},
+				{
+					"name" : "HEX1[0]",
+					"strict" : false
+				},
+				{
+					"name" : "HEX1[1]",
+					"strict" : false
+				},
+				{
+					"name" : "HEX1[2]",
+					"strict" : false
+				},
+				{
+					"name" : "HEX1[3]",
+					"strict" : false
+				},
+				{
+					"name" : "HEX1[4]",
+					"strict" : false
+				},
+				{
+					"name" : "HEX1[5]",
+					"strict" : false
+				},
+				{
+					"name" : "HEX1[6]",
+					"strict" : false
+				},
+				{
+					"name" : "HEX4[0]",
+					"strict" : false
+				},
+				{
+					"name" : "HEX4[1]",
+					"strict" : false
+				},
+				{
+					"name" : "HEX4[2]",
+					"strict" : false
+				},
+				{
+					"name" : "HEX4[3]",
+					"strict" : false
+				},
+				{
+					"name" : "HEX4[4]",
+					"strict" : false
+				},
+				{
+					"name" : "HEX4[5]",
+					"strict" : false
+				},
+				{
+					"name" : "HEX4[6]",
+					"strict" : false
+				},
+				{
+					"name" : "HEX5[0]",
+					"strict" : false
+				},
+				{
+					"name" : "HEX5[1]",
+					"strict" : false
+				},
+				{
+					"name" : "HEX5[2]",
+					"strict" : false
+				},
+				{
+					"name" : "HEX5[3]",
+					"strict" : false
+				},
+				{
+					"name" : "HEX5[4]",
+					"strict" : false
+				},
+				{
+					"name" : "HEX5[5]",
+					"strict" : false
+				},
+				{
+					"name" : "HEX5[6]",
+					"strict" : false
+				},
+				{
+					"name" : "MAX10_CLK1_50",
+					"strict" : false
+				},
+				{
+					"name" : "KEY[0]",
+					"strict" : false
+				},
+				{
+					"name" : "KEYPAD_COL[2]",
+					"strict" : false
+				},
+				{
+					"name" : "KEYPAD_COL[3]",
+					"strict" : false
+				},
+				{
+					"name" : "KEYPAD_COL[1]",
+					"strict" : false
+				},
+				{
+					"name" : "KEYPAD_COL[0]",
+					"strict" : false
+				}
+			]
+		}
+	]
+}
